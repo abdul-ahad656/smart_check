@@ -1,0 +1,46 @@
+instructions  
+read the tasks carefully (understanding is the part of the lab tasks).  
+all tasks are mandatory.  only appropriate queries would be entertained by the lab instructor.
+exchange of tasks is not allowed.  
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sample program
+sample program to display text filed and button that will show msg in text filed area on button click is attached herewith
+
+
+output example 01
+
+
+figure 1: example 1 output
+
+q:1 implement the gui as shown in figure 1 and figure 2 in java. on login button pressed check the username and password, if username is “test” and password is “123”, display “credentials verified” message in jlabel; otherwise display “credentials not verified”.
+
+figure 1:login page
+
+figure 2:login page
+
+
+q 2: 
+design a basic gui in which user will enter his/her name and age in text fields respectively. provide the user with a functionality to check whether he/she is eligible to vote or not. show the result of eligibility in a dialogue box. attached is the sample gui for the program.
+
+
+q 3: 
+design a basic gui in which user will enter two numbers in text fields respectively. provide the user with two functionalities of addition and multiplication through buttons. show the result of calculation in the textfield. also display your name in the frame using its property title. attached is the sample gui for the program.
+
+
+
+bonus task: try to show the result of calculation in a dialog instead of a label.

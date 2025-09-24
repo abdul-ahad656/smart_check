@@ -1,0 +1,201 @@
+computer communications and networks
+
+
+
+
+
+
+
+
+
+
+
+lab 08 
+
+multi-threaded tcp socket programming (concurrent)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+lab manual 08
+
+reference material
+
+what is a thread?
+analogy
+think of sewing needle as a processor and threads in a program as thread fiber. if you have two needles but only one thread, it would take longer to finish the job (as one needle is idle). whereas if you split the thread into two and use both needles at same time, you will end your task quickly. taking this analogy, a little further, if one needle had to sew on a button (blocking i/o), the other needle could continue doing other useful work even if the other needle took 1 hour to sew on a single button. if you only use one needle, you would be ~1 hour behind!
+a computer program becomes a process when it is loaded from some store into the computer's memory and begins execution. a process can be executed by a processor or a set of processors. a process description in memory contains vital information such as the program counter which keeps track of the current position in the program (i.e., which instruction is currently being executed), registers, variable stores, file handles, signals, and so forth. a thread is a sequence of such instructions within a program that can be executed independently of other code. 
+  
+thread operations include thread creation, termination, synchronization (joins,blocking), scheduling, data management and process interaction.
+a thread does not maintain a list of created threads, nor does it know the thread that created it.
+all threads within a process share the same address space.
+
+what is pthread?
+historically, hardware vendors have implemented their own proprietary versions of threads. these implementations differed substantially from each other making it difficult for programmers to develop portable threaded applications.
+in order to take full advantage of the capabilities provided by threads, a standardized programming interface was required.
+for unix systems, this interface has been specified by the ieee posix 1003.1c standard (1995).
+implementations adhering to this standard are referred to as posix threads, or pthreads.
+most hardware vendors now offer pthreads in addition to their proprietary api's.
+the posix standard has continued to evolve and undergo revisions, including the pthreads specification.
+pthreads are defined as a set of c language programming types and procedure calls, implemented with a pthread.h header/include file and a thread library - though this library may be part of another library, such as libc, in some implementations.
+
+why pthreads?
+when compared to the cost of creating and managing a process, a thread can be created with much less operating system overhead. managing threads requires fewer system resources than managing processes.
+the primary motivation for considering the use of pthreads in a high performance computing environment is to achieve optimum performance. in particular, if an application is using mpi for on-node communications, there is a potential that performance could be improved by using pthreads instead.
+mpi libraries usually implement on-node task communication via shared memory, which involves at least one memory copy operation (process to process).
+for pthreads there is no intermediate memory copy required because threads share the same address space within a single process. there is no data transfer, per se. it can be as efficient as simply passing a pointer.
+in the worst-case scenario, pthread communications become more of a cache-to-cpu or memory-to-cpu bandwidth issue. these speeds are much higher than mpi shared memory communications.
+
+
+
+pthread vs fork()
+
+pthread
+can specify more attributes for new threads during create
+can specify function for new thread to start with
+easy to grasp address space sharing
+
+
+fork()
+zero parameters
+set everything yourself after process creation
+new process begins with a virtual copy of parent at same location
+copy on write semantics require shared memory setup 
+
+the pthreads api
+routines which comprise the pthreads api can be informally grouped into four major groups:
+thread management: routines that work directly on threads - creating, detaching, joining, etc. they also include functions to set/query thread attributes (joinable, scheduling etc.)
+mutex: routines that deal with synchronization, called a "mutex", which is an abbreviation for "mutual exclusion". mutex functions provide for creating, destroying, locking and unlocking mutex. these are supplemented by mutex attribute functions that set or modify attributes associated with mutex.
+condition variables: routines that address communications between threads that share a mutex. based upon programmer specified conditions. this group includes functions to create, destroy, wait and signal based upon specified variable values. functions to set/query condition variable attributes are also included.
+synchronization: routines that manage read/write locks and barriers. 
+
+ creating threads:
+initially, your main () program comprises a single, default thread. all other threads must be explicitly created by the programmer.
+pthread_create creates a new thread and makes it executable. this routine can be called any number of times from anywhere within your code.
+pthread_create arguments:
+thread: an opaque, unique identifier for the new thread returned by the subroutine.
+attr: an opaque attribute object that may be used to set thread attributes. you can specify a thread attributes object, or null for the default values.
+start_routine: the c routine that the thread will execute once it is created.
+arg: a single argument that may be passed to start_routine. it must be passed by reference as a pointer cast of type void. null may be used if no argument is to be passed.
+#include <pthread.h>
+int pthread_create(pthread_t *restrict thread,
+const pthread_attr_t *restrict attr,
+void *(*start_routine)(void*), void *restrict arg);
+
+the   pthread_create() function  shall  create  a  new  thread,  with  attributes specified by attr, within a process. if attr is null, the default attributes shall be used. if the attributes specified by attr are modified later, the thread's attributes shall not be affected. upon successful completion, pthread_create() shall store the id of the created thread in the location referenced by thread.
+the thread is created executing start_routine with arg as its sole argument. if the start_routine returns, the effect shall be as if there was an implicit call to pthread_exit()  using  the  return  value  of start_routine  as the exit status. note that the thread in which main () was originally invoked differs from this. when it returns from main (), the effect shall be as if there was an implicit call to exit () using the return value of main () as the exit status.
+return value:
+if successful, the pthread_create() function shall return zero;  otherwise, an error number shall be returned to indicate the error.
+
+thread termination and joining
+#define _open_threads
+#include <pthread.h>
+
+void pthread_exit(void *status);
+
+ends the calling thread and makes status available to any thread that calls pthread_join() with the ending thread's thread id.
+
+dynamic memory allocation or de-allocation
+malloc ()
+the c library function void *malloc (size_t size) allocates the requested memory and returns a pointer to it.
+
+
+declaration
+following is the declaration for malloc () function.
+void *malloc (size_t size)
+parameters
+size − this is the size of the memory block, in bytes.
+return value
+this function returns a pointer to the allocated memory, or null if the request fails.
+free ()
+the c library function void free (void *ptr) deallocates the memory previously allocated by a call to calloc, malloc, or realloc.
+declaration
+following is the declaration for free () function.
+void free (void *ptr)
+parameters
+ptr − this is the pointer to a memory block previously allocated with malloc, calloc or realloc to be deallocated. if a null pointer is passed as argument, no action occurs.
+return value
+      this function does not return any value.
+
+file handling
+different operations that can be performed on a file are:
+creation of a new file (fopen with attributes as “a” or “a+” or “w” or “w++”)
+opening an existing file (fopen)
+reading from file (fscanf or fgetc)
+writing to a file (fprintf or fputs)
+closing a file (fclose)
+
+creating new file
+file *filepointer; 
+//so, the file can be opened as 
+filepointer = fopen(“filename.txt”, “w”)
+
+feek();
+the c library function int fseek(file *stream, long int offset, int whence) sets the file position of the stream to the given offset.
+declaration
+following is the declaration for fseek() function.
+	int fseek(file *stream, long int offset, int whence)
+
+
+fgets ()
+the c library function char *fgets(char *str, int n, file *stream) reads a line from the specified stream and stores it into the string pointed to by str. it stops when either (n-1) characters are read, the newline character is read, or the end-of-file is reached, whichever comes first.
+declaration
+following is the declaration for fgets() function.
+	char *fgets(char *str, int n, file *stream)
+
+fopen ()
+the c library function file *fopen(const char *filename, const char *mode) opens the filename pointed to, by filename using the given mode.
+declaration
+following is the declaration for fopen() function.
+	file *fopen(const char *filename, const char *mode)
+
+fclose ()
+the c library function int fclose(file *stream) closes the stream. all buffers are flushed.
+declaration
+following is the declaration for fclose() function.
+	int fclose(file *stream)
+
+lab tasks
+
+task1: write a c program that creates a thread, and that thread prints your name and registration number [5 marks]
+
+submission checking criteria
+screenshot of c program [2.5 marks]
+code [2.5 marks]
+
+task2: write a c program that creates a thread and passes your name and registration number as an argument, and prints the information in the function [10 marks]
+
+submission checking criteria
+screenshot of c program [5 marks]
+code [5 marks]
+
+
+
+task3: you have to implement a concurrent server using multi-threading [35 marks]
+
+server: 
+can handle multiple clients
+for every client, the server will make a separate thread
+after creating a thread, the main thread will go back wait for new connections.
+in thread:
+server will send ip address and port number assigned to a client [5 marks]
+server will send list of files available for download [5 marks]
+client will respond with file name [2 marks]
+server will then send content of file to the client [4 marks]
+after sending a file, server will again ask if the client may need to download more files (yes/no) [4 marks]
+if client says yes, then server will repeat from step 3 otherwise will close the connection [5 marks]
+screenshot of a complete running program [5 marks]
+client:
+client will make a tcp connection with server on a specific pot and ip address
+after displaying files names by server, a client can choose one file at a time to download
+the client will save the downloaded text in a .txt file in home folder [5 marks]

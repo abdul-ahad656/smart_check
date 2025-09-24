@@ -1,0 +1,49 @@
+taxi booking platform: feature list, tech stack, and timeline
+user app (react native)
+register/login (otp or email)
+profile management
+book a ride (pickup & destination using map)
+ride status tracking (requested, accepted, in-progress, completed)
+real-time map to see nearby drivers
+estimated fare display (static or distance-based)
+whatsapp chat/call with driver
+ride history
+push notifications (fcm)
+rate/review driver
+multi-language support (english + swahili)
+light/dark mode (optional)
+app version check/update prompt
+driver app (react native)
+register/login
+upload documents for kyc (id, dl)
+profile & vehicle info management
+set availability (online/offline)
+view & accept/reject ride requests
+navigation to pickup/drop using google maps
+whatsapp chat/call with user
+ride history
+daily/weekly earnings summary
+push notifications (fcm)
+rate/review rider
+document expiry alerts (optional)
+admin dashboard (react.js)
+login (admin access)
+manage users and drivers (view, edit, suspend)
+view all ride requests & statuses
+manual assignment or ride override (optional)
+kyc verification panel
+reporting: rides, users, cities
+earnings and trip summaries
+feedback/ratings viewer
+location heatmaps or driver zones (optional)
+backend (node.js + mysql)
+restful apis for all apps
+user & driver authentication
+ride request handling & assignment
+real-time location updates (socket.io)
+notification triggers (fcm)
+admin apis
+role-based access control
+logs & analytics
+whatsapp number linking for both apps
+location-based filtering & matching logic
